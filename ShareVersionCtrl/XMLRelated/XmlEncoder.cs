@@ -25,7 +25,6 @@ namespace ShareVersionCtrl.XMLRelated
             {
                 x.AddNodeTo(allFileVersion, doc);
             }
-
             XmlTextWriter tr = new XmlTextWriter(FileName, 
                 Encoding.GetEncoding("utf-8"));
             doc.WriteContentTo(tr);

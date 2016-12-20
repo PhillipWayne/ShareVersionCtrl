@@ -18,6 +18,7 @@ namespace ShareVersionCtrl.XMLRelated
         public String FileName;
         public String VersionName;
         public String FolderName;
+        public TreeViewItem myTvi;
 
         public FileAndFolderModel(String Type_)
         {
@@ -114,28 +115,32 @@ namespace ShareVersionCtrl.XMLRelated
             }
         }
 
-        public void ShowInTreeView(TreeViewItem treeViewItem)
+        public void ShowInTreeView(TreeViewItem treeViewItem, List<KeyValuePair<TreeViewItem, FileAndFolderModel>> treeFolderMap)
         {
             switch (Type)
             {
                 case Type_File:
-                    TreeViewItem file = new TreeViewItem();
-                    file.Header = FileName + "(" + VersionName + ")";
-                    treeViewItem.Items.Add(file);
+                    myTvi = new TreeViewItem();
+                    myTvi.Header = FileName + "(" + VersionName + ")";
+                    treeViewItem.Items.Add(myTvi);
+                    treeFolderMap.Add(new KeyValuePair<TreeViewItem, FileAndFolderModel>(
+                        myTvi, this));
                     break;
                 case Type_Folder:
-                    TreeViewItem folder = new TreeViewItem();
-                    folder.Header = FolderName;
-                    treeViewItem.Items.Add(folder);
-                    ShowInTreeFolder(folder);
+                    myTvi = new TreeViewItem();
+                    myTvi.Header = FolderName;
+                    treeViewItem.Items.Add(myTvi);
+                    treeFolderMap.Add(new KeyValuePair<TreeViewItem, FileAndFolderModel>(
+                        myTvi, this));
+                    ShowInTreeFolder(myTvi, treeFolderMap);
                     break;
             }
         }
-        public void ShowInTreeFolder(TreeViewItem treeViewItem)
+        public void ShowInTreeFolder(TreeViewItem treeViewItem, List<KeyValuePair<TreeViewItem, FileAndFolderModel>> treeFolderMap)
         {
             foreach (FileAndFolderModel child in Children)
             {
-                child.ShowInTreeView(treeViewItem);
+                child.ShowInTreeView(treeViewItem, treeFolderMap);
             }
         }
         

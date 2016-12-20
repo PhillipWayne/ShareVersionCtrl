@@ -34,9 +34,15 @@ namespace ShareVersionCtrl
     {
         FileAndFolderModel MainFolder;
         List<VersionModel> Versions;
+        List<KeyValuePair<TreeViewItem, FileAndFolderModel>> treeFolderMap;
+        List<KeyValuePair<TreeViewItem, SingleVersionFile>> treeSingleVersionMap;
+        List<KeyValuePair<TreeViewItem, VersionModel>> treeVersionMap;
         public MainWindow()
         {
             InitializeComponent();
+            treeFolderMap = new List<KeyValuePair<TreeViewItem, FileAndFolderModel>>();
+            treeSingleVersionMap = new List<KeyValuePair<TreeViewItem, SingleVersionFile>>();
+            treeVersionMap = new List<KeyValuePair<TreeViewItem, VersionModel>>();
             if (File.Exists("record.xml"))
             {
                 XmlDecoder xmlDecoder = new XmlDecoder("record.xml");
@@ -53,15 +59,40 @@ namespace ShareVersionCtrl
             //MessageBox.Show(VersionModel.ShowAllVersion(Versions));
             ShowFolderTree();
             ShowVersionTree();
+            treeView.SelectedItemChanged += TreeView_SelectedItemChanged;
         }
+
+        private void TreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            if (treeView.SelectedItem != null)
+            {
+                FileAndFolderModel fileOrFolder = null;
+                TreeViewItem x = (TreeViewItem)treeView.SelectedItem;
+                foreach (KeyValuePair<TreeViewItem, FileAndFolderModel> 
+                    pair in treeFolderMap)
+                {
+                    if (pair.Key == x)
+                    {
+                        fileOrFolder = pair.Value;
+                    }
+                }
+                if (fileOrFolder == null) return;
+                MessageBox.Show("FileName = " + fileOrFolder.FileName);
+            }
+        }
+
         public void ShowFolderTree()
         {
+            treeFolderMap.Clear();
             treeView.Items.Clear();
             TreeViewItem rootFolder = new TreeViewItem();
+            treeFolderMap.Add(new KeyValuePair<TreeViewItem, FileAndFolderModel>(
+                rootFolder, MainFolder));
             rootFolder.Header = "MainFolder";
-            MainFolder.ShowInTreeFolder(rootFolder);
+            MainFolder.ShowInTreeFolder(rootFolder, treeFolderMap);
             treeView.Items.Add(rootFolder);
             rootFolder.IsExpanded = true;
+            //MessageBox.Show("FolderMapCount = " + treeFolderMap.Count);
         }
         public void ShowVersionTree()
         {
