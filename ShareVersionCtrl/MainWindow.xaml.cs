@@ -37,6 +37,11 @@ namespace ShareVersionCtrl
         List<KeyValuePair<TreeViewItem, FileAndFolderModel>> treeFolderMap;
         List<KeyValuePair<TreeViewItem, SingleVersionFile>> treeSingleVersionMap;
         List<KeyValuePair<TreeViewItem, VersionModel>> treeVersionMap;
+        FileAndFolderModel foundFileOrFolder = null;
+        SingleVersionFile foundSingleVersionFile = null;
+        VersionModel foundVersionModel = null;
+        public String targetFolder = "../共享";
+
         public MainWindow()
         {
             InitializeComponent();
@@ -60,6 +65,115 @@ namespace ShareVersionCtrl
             ShowFolderTree();
             ShowVersionTree();
             treeView.SelectedItemChanged += TreeView_SelectedItemChanged;
+            treeViewVersion.SelectedItemChanged += TreeViewVersion_SelectedItemChanged;
+            onSelectFileChanged();
+            onSelectVersionChanged();
+            Directory.CreateDirectory(targetFolder);
+            MessageBox.Show("" + Directory.Exists(targetFolder));
+            Directory.Delete(targetFolder); //不能删除非空文件夹
+            MessageBox.Show("" + Directory.Exists(targetFolder));
+        }
+
+        public void onSelectFileChanged()
+        {
+            if (foundFileOrFolder == null)
+            {
+                newFile.IsEnabled = false;
+                refreshFile.IsEnabled = false;
+                deleteFile.IsEnabled = false;
+                newFolder.IsEnabled = false;
+                renameFolder.IsEnabled = false;
+                deleteFolder.IsEnabled = false;
+            }
+            else
+            {
+                switch (foundFileOrFolder.Type)
+                {
+                    case FileAndFolderModel.Type_File:
+                        newFile.IsEnabled = false;
+                        refreshFile.IsEnabled = true;
+                        deleteFile.IsEnabled = true;
+                        newFolder.IsEnabled = false;
+                        renameFolder.IsEnabled = false;
+                        deleteFolder.IsEnabled = false;
+                        break;
+                    case FileAndFolderModel.Type_Folder:
+                        newFile.IsEnabled = true;
+                        refreshFile.IsEnabled = false;
+                        deleteFile.IsEnabled = false;
+                        newFolder.IsEnabled = true;
+                        renameFolder.IsEnabled = true;
+                        deleteFolder.IsEnabled = true;
+                        break;
+                }
+            }
+        }
+
+        public void onSelectVersionChanged()
+        {
+            if (foundSingleVersionFile == null)
+            {
+                deleteVersion.IsEnabled = false;
+            }
+            else
+            {
+                deleteVersion.IsEnabled = true;
+            }
+            if (foundVersionModel == null)
+            {
+                createVerion.IsEnabled = false;
+                deleteRef.IsEnabled = false;
+            }
+            else
+            {
+                createVerion.IsEnabled = true;
+                deleteRef.IsEnabled = true;
+            }
+        }
+
+        private void TreeViewVersion_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            if (treeViewVersion.SelectedItem != null)
+            {
+                TreeViewItem x = (TreeViewItem)treeViewVersion.SelectedItem;
+                VersionModel versionModelFound = null;
+                SingleVersionFile versionFileFound = null;
+                foreach (KeyValuePair<TreeViewItem, VersionModel>
+                    pair in treeVersionMap)
+                {
+                    if (pair.Key == x)
+                    {
+                        versionModelFound = pair.Value;
+                        break;
+                    }
+                }
+                if (versionModelFound == null)
+                {
+                    foreach (KeyValuePair<TreeViewItem, SingleVersionFile>
+                    pair in treeSingleVersionMap)
+                    {
+                        if (pair.Key == x)
+                        {
+                            versionFileFound = pair.Value;
+                            break;
+                        }
+                    }
+                }
+                // MessageBox.Show("Select Version!" + versionFileFound + "," +
+                //    versionModelFound);
+                if (versionFileFound == null && versionModelFound == null) return;
+                if (versionFileFound != null)
+                {
+                    foundSingleVersionFile = versionFileFound;
+                    foundVersionModel = null;
+                }
+                else
+                {
+                    foundSingleVersionFile = null;
+                    foundVersionModel = versionModelFound;
+                }
+                onSelectVersionChanged();
+            }
         }
 
         private void TreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
@@ -74,10 +188,13 @@ namespace ShareVersionCtrl
                     if (pair.Key == x)
                     {
                         fileOrFolder = pair.Value;
+                        break;
                     }
                 }
                 if (fileOrFolder == null) return;
-                MessageBox.Show("FileName = " + fileOrFolder.FileName);
+                foundFileOrFolder = fileOrFolder;
+                //MessageBox.Show("FileName = " + fileOrFolder.FileName);
+                onSelectFileChanged();
             }
         }
 
@@ -97,14 +214,10 @@ namespace ShareVersionCtrl
         public void ShowVersionTree()
         {
             treeViewVersion.Items.Clear();
-            TreeViewItem versionTree = new TreeViewItem();
-            versionTree.Header = "Versions";
-            treeViewVersion.Items.Add(versionTree);
             foreach (VersionModel x in Versions)
             {
-                x.ShowInTree(versionTree);
+                x.ShowInTree(treeViewVersion, treeSingleVersionMap, treeVersionMap);
             }
-            versionTree.IsExpanded = true;
         }
     }
 }

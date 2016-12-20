@@ -70,17 +70,23 @@ namespace ShareVersionCtrl.XMLRelated
             }
             return str;
         }
-        public void ShowInTree(TreeViewItem treeViewItem)
+        public void ShowInTree(TreeView treeView, 
+            List<KeyValuePair<TreeViewItem, SingleVersionFile>> treeSingleVersionMap, 
+            List<KeyValuePair<TreeViewItem, VersionModel>> treeVersionMap)
         {
             TreeViewItem tvi = new TreeViewItem();
             tvi.Header = FileName;
-            treeViewItem.Items.Add(tvi);
+            treeView.Items.Add(tvi);
+            treeVersionMap.Add(new KeyValuePair<TreeViewItem, VersionModel>(
+                tvi, this));
             foreach (SingleVersionFile svf in versionList)
             {
                 TreeViewItem x = new TreeViewItem();
                 x.Header = svf.VersionName + "(" + svf.Depict + 
                     "," + svf.Date + ")";
                 tvi.Items.Add(x);
+                treeSingleVersionMap.Add(new KeyValuePair<TreeViewItem, SingleVersionFile>
+                    (x, svf));
             }
         }
     }

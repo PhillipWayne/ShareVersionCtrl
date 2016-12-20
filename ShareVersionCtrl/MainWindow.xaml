@@ -9,6 +9,17 @@
     <Grid>
         <TreeView x:Name="treeView" HorizontalAlignment="Left" Width="321.002"/>
         <TreeView x:Name="treeViewVersion" HorizontalAlignment="Right" Width="267.002"/>
+        <Button x:Name="newFile" Content="新建文件引用" Height="29.866" Margin="344.8,84.734,292.733,0" VerticalAlignment="Top"/>
+        <Button x:Name="deleteFile" Content="删除文件引用" Height="29.866" Margin="344.8,154.466,292.733,0" VerticalAlignment="Top" Background="#FFF30F0F"/>
+        <Button x:Name="newFolder" Content="新建文件夹" Height="29.866" Margin="344.8,189.332,292.733,0" VerticalAlignment="Top"/>
+        <Button x:Name="renameFolder" Content="重命名文件夹" Margin="344.8,224.198,292.733,229.536"/>
+        <Button x:Name="deleteFolder" Content="删除文件夹" Height="29.866" Margin="344.8,0,292.733,194.67" VerticalAlignment="Bottom" Background="#FFB90E0E"/>
+        <Button x:Name="newRef" Content="新建引用对象" Height="29.866" Margin="344.8,0,292.733,90.072" VerticalAlignment="Bottom"/>
+        <Button x:Name="deleteRef" Content="删除引用对象" Height="29.866" Margin="344.8,0,292.733,55.206" VerticalAlignment="Bottom" Background="#FFB62222"/>
+        <Button x:Name="createVerion" Content="从文件新建版本" Height="29.866" Margin="344.8,0,292.733,159.804" VerticalAlignment="Bottom"/>
+        <Button x:Name="deleteVersion" Content="删除此版本" Height="29.866" Margin="344.8,0,292.733,124.938" VerticalAlignment="Bottom" Background="#FFF01717"/>
+        <Button x:Name="refreshFile" Content="更新文件引用" Height="29.866" Margin="344.8,119.6,292.733,0" VerticalAlignment="Top"/>
+        <Button x:Name="setFolder" Content="设置目标文件目录" Height="40.206" Margin="344.8,0,292.733,10" VerticalAlignment="Bottom"/>
 
     </Grid>
 </Window>
