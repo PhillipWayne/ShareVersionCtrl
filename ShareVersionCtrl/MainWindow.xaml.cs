@@ -39,7 +39,7 @@ namespace ShareVersionCtrl
             InitializeComponent();
             if (File.Exists("record.xml"))
             {
-                XmlDecoder xmlDecoder = new XmlDecoder("init.xml");
+                XmlDecoder xmlDecoder = new XmlDecoder("record.xml");
                 MainFolder = xmlDecoder.MainFolder;
                 Versions = xmlDecoder.Versions;
             }
@@ -49,8 +49,31 @@ namespace ShareVersionCtrl
                 Versions = new List<VersionModel>();
             }
             XmlEncoder.XmlOutput(MainFolder, Versions, "record.xml");
-            MessageBox.Show(MainFolder.GetTreeInfo(0));
-            MessageBox.Show(VersionModel.ShowAllVersion(Versions));
+            //MessageBox.Show(MainFolder.GetTreeInfo(0));
+            //MessageBox.Show(VersionModel.ShowAllVersion(Versions));
+            ShowFolderTree();
+            ShowVersionTree();
+        }
+        public void ShowFolderTree()
+        {
+            treeView.Items.Clear();
+            TreeViewItem rootFolder = new TreeViewItem();
+            rootFolder.Header = "MainFolder";
+            MainFolder.ShowInTreeFolder(rootFolder);
+            treeView.Items.Add(rootFolder);
+            rootFolder.IsExpanded = true;
+        }
+        public void ShowVersionTree()
+        {
+            treeViewVersion.Items.Clear();
+            TreeViewItem versionTree = new TreeViewItem();
+            versionTree.Header = "Versions";
+            treeViewVersion.Items.Add(versionTree);
+            foreach (VersionModel x in Versions)
+            {
+                x.ShowInTree(versionTree);
+            }
+            versionTree.IsExpanded = true;
         }
     }
 }

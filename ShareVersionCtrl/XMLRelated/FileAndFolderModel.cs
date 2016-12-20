@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 using System.Xml;
 
 namespace ShareVersionCtrl.XMLRelated
@@ -16,6 +17,7 @@ namespace ShareVersionCtrl.XMLRelated
         public int Type = Type_NULL;
         public String FileName;
         public String VersionName;
+        public String FolderName;
 
         public FileAndFolderModel(String Type_)
         {
@@ -44,6 +46,14 @@ namespace ShareVersionCtrl.XMLRelated
             {
                 FileName = FileName_;
                 VersionName = VersionName_;
+            }
+        }
+
+        public void SetFolder(String FolderName_)
+        {
+            if (Type == Type_Folder)
+            {
+                FolderName = FolderName_;
             }
         }
 
@@ -90,6 +100,7 @@ namespace ShareVersionCtrl.XMLRelated
                 case Type_Folder:
                     XmlElement folder = doc.CreateElement("Child");
                     folder.SetAttribute("Type", "Folder");
+                    folder.SetAttribute("FolderName", FolderName);
                     root.AppendChild(folder);
                     AddNodeToFolder(folder, doc);
                     break;
@@ -100,6 +111,31 @@ namespace ShareVersionCtrl.XMLRelated
             foreach (FileAndFolderModel child in Children)
             {
                 child.AddNodeTo(folder, doc);
+            }
+        }
+
+        public void ShowInTreeView(TreeViewItem treeViewItem)
+        {
+            switch (Type)
+            {
+                case Type_File:
+                    TreeViewItem file = new TreeViewItem();
+                    file.Header = FileName + "(" + VersionName + ")";
+                    treeViewItem.Items.Add(file);
+                    break;
+                case Type_Folder:
+                    TreeViewItem folder = new TreeViewItem();
+                    folder.Header = FolderName;
+                    treeViewItem.Items.Add(folder);
+                    ShowInTreeFolder(folder);
+                    break;
+            }
+        }
+        public void ShowInTreeFolder(TreeViewItem treeViewItem)
+        {
+            foreach (FileAndFolderModel child in Children)
+            {
+                child.ShowInTreeView(treeViewItem);
             }
         }
         

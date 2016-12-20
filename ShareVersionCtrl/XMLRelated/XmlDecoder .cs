@@ -61,6 +61,7 @@ namespace ShareVersionCtrl.XMLRelated
                     case FileAndFolderModel.Type_Folder:
                         XmlNodeList xnl = xe.ChildNodes;
                         LoopInFolfer(ffchild, xnl);
+                        ffchild.SetFolder(xe.GetAttribute("FolderName"));
                         Folder.AddToFolder(ffchild);
                         break;
                 }

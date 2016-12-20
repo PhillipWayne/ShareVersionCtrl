@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 using System.Xml;
 
 namespace ShareVersionCtrl.XMLRelated
@@ -68,6 +69,19 @@ namespace ShareVersionCtrl.XMLRelated
                 str += "\r\n" + x.GetTreeInfo();
             }
             return str;
+        }
+        public void ShowInTree(TreeViewItem treeViewItem)
+        {
+            TreeViewItem tvi = new TreeViewItem();
+            tvi.Header = FileName;
+            treeViewItem.Items.Add(tvi);
+            foreach (SingleVersionFile svf in versionList)
+            {
+                TreeViewItem x = new TreeViewItem();
+                x.Header = svf.VersionName + "(" + svf.Depict + 
+                    "," + svf.Date + ")";
+                tvi.Items.Add(x);
+            }
         }
     }
 }

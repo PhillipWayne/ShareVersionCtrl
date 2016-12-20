@@ -5,8 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ShareVersionCtrl"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="MainWindow" Height="513.2" Width="768.2">
     <Grid>
-        
+        <TreeView x:Name="treeView" HorizontalAlignment="Left" Width="321.002"/>
+        <TreeView x:Name="treeViewVersion" HorizontalAlignment="Right" Width="267.002"/>
+
     </Grid>
 </Window>
