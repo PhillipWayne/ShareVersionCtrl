@@ -1,4 +1,5 @@
-﻿using ShareVersionCtrl.XMLRelated;
+﻿using ShareVersionCtrl.MyMessageBox;
+using ShareVersionCtrl.XMLRelated;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -32,6 +33,7 @@ namespace ShareVersionCtrl
     /// </summary>
     public partial class MainWindow : Window
     {
+        public const String passwd = "pkumakerspace";
         FileAndFolderModel MainFolder;
         List<VersionModel> Versions;
         List<KeyValuePair<TreeViewItem, FileAndFolderModel>> treeFolderMap;
@@ -59,7 +61,6 @@ namespace ShareVersionCtrl
                 MainFolder = new FileAndFolderModel("Folder");
                 Versions = new List<VersionModel>();
             }
-            XmlEncoder.XmlOutput(MainFolder, Versions, "record.xml");
             //MessageBox.Show(MainFolder.GetTreeInfo(0));
             //MessageBox.Show(VersionModel.ShowAllVersion(Versions));
             ShowFolderTree();
@@ -68,10 +69,46 @@ namespace ShareVersionCtrl
             treeViewVersion.SelectedItemChanged += TreeViewVersion_SelectedItemChanged;
             onSelectFileChanged();
             onSelectVersionChanged();
-            Directory.CreateDirectory(targetFolder);
+            /*Directory.CreateDirectory(targetFolder);
             MessageBox.Show("" + Directory.Exists(targetFolder));
-            Directory.Delete(targetFolder); //不能删除非空文件夹
-            MessageBox.Show("" + Directory.Exists(targetFolder));
+            Directory.Delete(targetFolder, true); //不能删除非空文件夹
+            MessageBox.Show("" + Directory.Exists(targetFolder));*/
+            this.KeyDown += MainWindow_KeyDown;
+            newRef.Click += NewRef_Click;
+        }
+
+        private void MainWindow_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.S && (Keyboard.Modifiers & (ModifierKeys.Control)) == (ModifierKeys.Control))
+            {
+                AskSingleInput.InputData inputData = new AskSingleInput.InputData();
+                if (AskSingleInput.Show("管理员修改密码：", "保存设置", inputData) == true)
+                {
+                    //MessageBox.Show("Success");
+                    if (inputData.Input.Equals(passwd))
+                    {
+                        //密码通过
+                        XmlEncoder.XmlOutput(MainFolder, Versions, "record.xml");
+                        MessageBox.Show("修改保存成功");
+                    }
+                    else
+                    {
+                        MessageBox.Show("密码错误");
+                    }
+                }
+            }
+        }
+
+        private void NewRef_Click(object sender, RoutedEventArgs e)
+        {
+            AskSingleInput.InputData inputData = new AskSingleInput.InputData();
+            if (AskSingleInput.Show("引用名称：", "新建引用", inputData) == true)
+            {
+                //MessageBox.Show("Success");
+                VersionModel versionModel = new VersionModel(inputData.Input);
+                Versions.Add(versionModel);
+                ShowVersionTree();
+            }
         }
 
         public void onSelectFileChanged()
