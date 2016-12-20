@@ -11,17 +11,36 @@ namespace ShareVersionCtrl.XMLRelated
     public class XmlDecoder
     {
         public FileAndFolderModel MainFolder;
+        public List<VersionModel> Versions;
         XmlDocument doc;
 
         public XmlDecoder()
         {
             MainFolder = new FileAndFolderModel("Folder");
+            Versions = new List<VersionModel>();
             //MessageBox.Show("XmlDecorder!");
             doc = new XmlDocument();
             doc.Load(@"record.xml");
-            XmlNode xmlNode = doc.SelectSingleNode("MainFolder");
-            XmlNodeList xmlNodeList = xmlNode.ChildNodes;
+            //解析目录结构
+            XmlNode fatherxmlNode = doc.SelectSingleNode("Info");
+            XmlNode xmlNode1 = fatherxmlNode.ChildNodes.Item(0);
+            XmlNodeList xmlNodeList = xmlNode1.ChildNodes;
             LoopInFolfer(MainFolder, xmlNodeList);
+            //解析版本列表
+            XmlNode xmlNode2 = fatherxmlNode.ChildNodes.Item(1);
+            XmlNodeList xmlNodeList2 = xmlNode2.ChildNodes;
+            foreach (XmlNode xn in xmlNodeList2)
+            {
+                XmlElement xe = (XmlElement)xn;
+                VersionModel versionModel = new VersionModel(
+                    xe.GetAttribute("FileName").ToString());
+                XmlNodeList xnl = xe.ChildNodes;
+                foreach (XmlNode x in xnl)
+                {
+                    versionModel.AddSingleVersion((XmlElement)x);
+                }
+                Versions.Add(versionModel);
+            }
         }
         
         private void LoopInFolfer(FileAndFolderModel Folder, XmlNodeList xmlNodeList)
@@ -32,20 +51,30 @@ namespace ShareVersionCtrl.XMLRelated
                 //MessageBox.Show(xe.GetAttribute("Type").ToString());
                 FileAndFolderModel ffchild = new FileAndFolderModel(
                     xe.GetAttribute("Type").ToString());
-                XmlNodeList xnl = xe.ChildNodes;
                 switch (ffchild.Type)
                 {
                     case FileAndFolderModel.Type_File:
-                        ffchild.SetFile(xnl.Item(0).InnerText, 
-                            xnl.Item(1).InnerText);
+                        ffchild.SetFile(xe.GetAttribute("FileName").ToString(),
+                            xe.GetAttribute("VersionName").ToString());
                         Folder.AddToFolder(ffchild);
                         break;
                     case FileAndFolderModel.Type_Folder:
+                        XmlNodeList xnl = xe.ChildNodes;
                         LoopInFolfer(ffchild, xnl);
                         Folder.AddToFolder(ffchild);
                         break;
                 }
             }
+        }
+
+        public String ShowAllVersion()
+        {
+            String str = "Versions:";
+            foreach (VersionModel x in Versions)
+            {
+                str += "\r\n" + x.GetTreeInfo();
+            }
+            return str;
         }
     }
 }

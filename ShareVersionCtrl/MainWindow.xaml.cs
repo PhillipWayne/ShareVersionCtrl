@@ -36,6 +36,7 @@ namespace ShareVersionCtrl
             InitializeComponent();
             XmlDecoder xmlDecoder = new XmlDecoder();
             MessageBox.Show(xmlDecoder.MainFolder.GetTreeInfo(0));
+            MessageBox.Show(xmlDecoder.ShowAllVersion());
         }
     }
 }

@@ -55,6 +55,8 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="XMLRelated\FileAndFolderModel.cs" />
+    <Compile Include="XMLRelated\SingleVersionFile.cs" />
+    <Compile Include="XMLRelated\VersionModel.cs" />
     <Compile Include="XMLRelated\XmlDecoder .cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
