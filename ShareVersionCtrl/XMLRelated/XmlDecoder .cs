@@ -14,13 +14,13 @@ namespace ShareVersionCtrl.XMLRelated
         public List<VersionModel> Versions;
         XmlDocument doc;
 
-        public XmlDecoder()
+        public XmlDecoder(String sourceFile)
         {
             MainFolder = new FileAndFolderModel("Folder");
             Versions = new List<VersionModel>();
             //MessageBox.Show("XmlDecorder!");
             doc = new XmlDocument();
-            doc.Load(@"record.xml");
+            doc.Load(sourceFile);
             //解析目录结构
             XmlNode fatherxmlNode = doc.SelectSingleNode("Info");
             XmlNode xmlNode1 = fatherxmlNode.ChildNodes.Item(0);
@@ -65,16 +65,6 @@ namespace ShareVersionCtrl.XMLRelated
                         break;
                 }
             }
-        }
-
-        public String ShowAllVersion()
-        {
-            String str = "Versions:";
-            foreach (VersionModel x in Versions)
-            {
-                str += "\r\n" + x.GetTreeInfo();
-            }
-            return str;
         }
     }
 }

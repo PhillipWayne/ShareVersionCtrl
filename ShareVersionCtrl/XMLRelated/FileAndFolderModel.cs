@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 
 namespace ShareVersionCtrl.XMLRelated
 {
@@ -73,6 +74,33 @@ namespace ShareVersionCtrl.XMLRelated
                     return str + ")";
             }
             return "%BUG%";
+        }
+
+        public void AddNodeTo(XmlElement root, XmlDocument doc)
+        {
+            switch (Type)
+            {
+                case Type_File:
+                    XmlElement file = doc.CreateElement("Child");
+                    file.SetAttribute("Type", "File");
+                    file.SetAttribute("FileName", FileName);
+                    file.SetAttribute("VersionName", VersionName);
+                    root.AppendChild(file);
+                    break;
+                case Type_Folder:
+                    XmlElement folder = doc.CreateElement("Child");
+                    folder.SetAttribute("Type", "Folder");
+                    root.AppendChild(folder);
+                    AddNodeToFolder(folder, doc);
+                    break;
+            }
+        }
+        public void AddNodeToFolder(XmlElement folder, XmlDocument doc)
+        {
+            foreach (FileAndFolderModel child in Children)
+            {
+                child.AddNodeTo(folder, doc);
+            }
         }
         
     }

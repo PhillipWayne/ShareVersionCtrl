@@ -54,6 +54,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="XMLRelated\XmlEncoder.cs" />
     <Compile Include="XMLRelated\FileAndFolderModel.cs" />
     <Compile Include="XMLRelated\SingleVersionFile.cs" />
     <Compile Include="XMLRelated\VersionModel.cs" />

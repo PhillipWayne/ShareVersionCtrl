@@ -1,6 +1,7 @@
 ﻿using ShareVersionCtrl.XMLRelated;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -31,12 +32,25 @@ namespace ShareVersionCtrl
     /// </summary>
     public partial class MainWindow : Window
     {
+        FileAndFolderModel MainFolder;
+        List<VersionModel> Versions;
         public MainWindow()
         {
             InitializeComponent();
-            XmlDecoder xmlDecoder = new XmlDecoder();
-            MessageBox.Show(xmlDecoder.MainFolder.GetTreeInfo(0));
-            MessageBox.Show(xmlDecoder.ShowAllVersion());
+            if (File.Exists("record.xml"))
+            {
+                XmlDecoder xmlDecoder = new XmlDecoder("init.xml");
+                MainFolder = xmlDecoder.MainFolder;
+                Versions = xmlDecoder.Versions;
+            }
+            else
+            {
+                MainFolder = new FileAndFolderModel("Folder");
+                Versions = new List<VersionModel>();
+            }
+            XmlEncoder.XmlOutput(MainFolder, Versions, "record.xml");
+            MessageBox.Show(MainFolder.GetTreeInfo(0));
+            MessageBox.Show(VersionModel.ShowAllVersion(Versions));
         }
     }
 }
