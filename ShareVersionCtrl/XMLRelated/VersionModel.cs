@@ -24,6 +24,10 @@ namespace ShareVersionCtrl.XMLRelated
             svf.VersionName = x.GetAttribute("VersionName").ToString();
             svf.Depict = x.GetAttribute("Depict").ToString();
             svf.Date = x.GetAttribute("Date").ToString();
+            AddSingleVersion(svf);
+        }
+        public void AddSingleVersion(SingleVersionFile svf)
+        {
             versionList.Add(svf);
         }
         public override bool Equals(object obj)
@@ -92,6 +96,14 @@ namespace ShareVersionCtrl.XMLRelated
                 treeSingleVersionMap.Add(new KeyValuePair<TreeViewItem, SingleVersionFile>
                     (x, svf));
             }
+        }
+        public bool IsExistVersion(String VersionN)
+        {
+            foreach (SingleVersionFile svf in versionList)
+            {
+                if (svf.VersionName.Equals(VersionN)) return true;
+            }
+            return false;
         }
     }
 }

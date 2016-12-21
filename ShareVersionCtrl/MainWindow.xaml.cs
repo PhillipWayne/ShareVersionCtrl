@@ -17,6 +17,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.ComponentModel;
+using Microsoft.Win32;
 
 namespace ShareVersionCtrl
 {
@@ -88,6 +89,70 @@ namespace ShareVersionCtrl
             this.KeyDown += MainWindow_KeyDown;
             newRef.Click += NewRef_Click;
             deleteRef.Click += DeleteRef_Click;
+            createVerion.Click += CreateVerion_Click;
+            deleteVersion.Click += DeleteVersion_Click;
+        }
+
+        private void DeleteVersion_Click(object sender, RoutedEventArgs e)
+        {
+            if (foundSingleVersionFile == null)
+            {
+                MessageBox.Show("软件错误，请联系管理员");
+                return;
+            }
+            VersionModel father = null;
+            for (int i=0; i< treeVersionMap.Count; i++)
+            {
+                if (treeVersionMap[i].Value.FileName.Equals(
+                    foundSingleVersionFile.FatherName))
+                {
+                    father = treeVersionMap[i].Value;
+                    break;
+                }
+            }
+            if (father == null)
+            {
+                MessageBox.Show("软件错误，请联系管理员");
+                return;
+            }
+            if (MainFolder.AskDeleteAllRef(father.FileName, foundSingleVersionFile.VersionName,
+                "") == false) return;
+            MainFolder.CommitDeleteRef(father.FileName, foundSingleVersionFile.VersionName);
+            father.versionList.Remove(foundSingleVersionFile);
+            refManager.DeleteVersion(father.FileName, foundSingleVersionFile.VersionName);
+            ShowFolderTree();
+            ShowVersionTree();
+        }
+
+        private void CreateVerion_Click(object sender, RoutedEventArgs e)
+        {
+            if (foundVersionModel == null)
+            {
+                MessageBox.Show("软件错误，请联系管理员");
+                return;
+            }
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            var result = openFileDialog.ShowDialog();
+            if (result == false) return;
+            //MessageBox.Show(openFileDialog.FileName);
+            String targetFileName = openFileDialog.SafeFileName;
+            if (foundVersionModel.IsExistVersion(targetFileName))
+            {
+                MessageBox.Show("已有此版本文件，请重试");
+                return;
+            }
+            //MessageBox.Show(targetFileName);
+            AskSingleInput.InputData inputData = new AskSingleInput.InputData();
+            if (AskSingleInput.Show("版本描述", "新建版本", inputData) == false) return;
+            SingleVersionFile svf = new SingleVersionFile();
+            svf.FatherName = foundVersionModel.FileName;
+            svf.VersionName = targetFileName;
+            svf.Depict = inputData.Input;
+            //MessageBox.Show("Time : " + DateTime.Now.ToString());
+            svf.Date = DateTime.Now.ToString();
+            refManager.CopyVersion(openFileDialog.FileName, svf);
+            foundVersionModel.AddSingleVersion(svf);
+            ShowVersionTree();
         }
 
         private void DeleteRef_Click(object sender, RoutedEventArgs e)
@@ -106,8 +171,12 @@ namespace ShareVersionCtrl
             }
             //MessageBox.Show("正在删除");
             //以后还要在这里实现删除的时候连带所有的引用一并删除！！！
+            if (MainFolder.AskDeleteAllRef(foundVersionModel.FileName, null,
+                "") == false) return;
+            MainFolder.CommitDeleteRef(foundVersionModel.FileName, null);
             refManager.DeleteRef(foundVersionModel.FileName);
             Versions.Remove(foundVersionModel);
+            ShowFolderTree();
             ShowVersionTree();
         }
 
@@ -123,7 +192,7 @@ namespace ShareVersionCtrl
                 if (PasswdCheck.Check())
                 {
                     ModifyPer = true;
-                    MessageBox.Show("开启权限成功");
+                    //MessageBox.Show("开启权限成功");
                     onSelectFileChanged();
                     onSelectVersionChanged();
                 }

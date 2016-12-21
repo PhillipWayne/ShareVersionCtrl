@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ShareVersionCtrl.XMLRelated;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -33,6 +34,19 @@ namespace ShareVersionCtrl.RefManage
             if (! Directory.Exists(RefFolder + "/" + RefName)) return false;
             Directory.Delete(RefFolder + "/" + RefName, true); //彻底删除非空文件夹
             return true;
+        }
+
+        public bool DeleteVersion(String RefName, String VersionName)
+        {
+            if (!File.Exists(RefFolder + "/" + RefName + "/" + VersionName)) return false;
+            File.Delete(RefFolder + "/" + RefName + "/" + VersionName);
+            return true;
+        }
+
+        public void CopyVersion(String source, SingleVersionFile svf)
+        {
+            File.Copy(source, Environment.CurrentDirectory + "\\" +
+                RefFolder + "\\" + svf.FatherName + "\\" + svf.VersionName);
         }
     }
 }

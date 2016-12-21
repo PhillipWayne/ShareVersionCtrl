@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ShareVersionCtrl.MyMessageBox;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -143,6 +144,67 @@ namespace ShareVersionCtrl.XMLRelated
                 child.ShowInTreeView(treeViewItem, treeFolderMap);
             }
         }
-        
+        public bool AskDeleteAllRef(String tarFileName, String tarVersionName, 
+            String FatherPath)
+        {
+            switch (Type)
+            {
+                case Type_File:
+                    if (FileName.Equals(tarFileName))
+                    {
+                        if (tarVersionName == null) //忽略版本信息
+                        {
+                            if (NoAskNsg.Show("确认删除：" + FatherPath + FileName,
+                                "删除确认") == false) return false;
+                        }
+                        else
+                        {
+                            if (VersionName.Equals(tarVersionName))
+                            {
+                                if (NoAskNsg.Show("确认删除：" + FatherPath + FileName,
+                                "删除确认") == false) return false;
+                            }
+                        }
+                    }
+                    break;
+                case Type_Folder:
+                    foreach (FileAndFolderModel child in Children)
+                    {
+                        if (child.AskDeleteAllRef(tarFileName, tarVersionName,
+                            FatherPath + FolderName + "/") == false) return false;
+                    }
+                    break;
+            }
+            return true;
+        }
+        public bool CommitDeleteRef(String tarFileName, String tarVersionName)
+        {
+            switch (Type)
+            {
+                case Type_File:
+                    if (FileName.Equals(tarFileName))
+                    {
+                        if (tarVersionName == null) //忽略版本信息
+                        {
+                            return true;
+                        }
+                        else if (VersionName.Equals(tarVersionName)) return true;
+                    }
+                    break;
+                case Type_Folder:
+                    for (int i=0; i<Children.Count; i++)
+                    {
+                        if (Children[i].CommitDeleteRef(tarFileName, tarVersionName)
+                            == true)
+                        {
+                            //删除这一级的child
+                            Children.RemoveAt(i);
+                            i--;
+                        }
+                    }
+                    break;
+            }
+            return false; //不删除
+        }
     }
 }
