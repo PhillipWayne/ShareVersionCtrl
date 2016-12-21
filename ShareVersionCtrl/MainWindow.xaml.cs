@@ -91,6 +91,26 @@ namespace ShareVersionCtrl
             deleteRef.Click += DeleteRef_Click;
             createVerion.Click += CreateVerion_Click;
             deleteVersion.Click += DeleteVersion_Click;
+            newFolder.Click += NewFolder_Click;
+        }
+
+        private void NewFolder_Click(object sender, RoutedEventArgs e)
+        {
+            if (foundFileOrFolder == null || 
+                foundFileOrFolder.Type != FileAndFolderModel.Type_Folder)
+            {
+                MessageBox.Show("软件错误，请联系管理员");
+                return;
+            }
+            AskSingleInput.InputData inputData = new AskSingleInput.InputData();
+            if (AskSingleInput.Show("文件夹名", "新建文件夹", inputData) == false)
+                return;
+            if (foundFileOrFolder.TryNewFolder(inputData.Input) == false)
+            {
+                MessageBox.Show("文件夹已存在，请换其他名称尝试");
+                return;
+            }
+            ShowFolderTree();
         }
 
         private void DeleteVersion_Click(object sender, RoutedEventArgs e)

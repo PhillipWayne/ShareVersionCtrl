@@ -206,5 +206,19 @@ namespace ShareVersionCtrl.XMLRelated
             }
             return false; //不删除
         }
+        public bool TryNewFolder(String newFolderName)
+        {
+            if (Type != Type_Folder) return false;
+            foreach (FileAndFolderModel child in Children)
+            {
+                if (child.Type == Type_Folder &&
+                    child.FolderName.Equals(newFolderName)) return false;
+            }
+            //可以添加且不冲突
+            FileAndFolderModel ffm = new FileAndFolderModel("Folder");
+            ffm.FolderName = newFolderName;
+            Children.Add(ffm);
+            return true;
+        }
     }
 }
