@@ -1,4 +1,5 @@
 ﻿using ShareVersionCtrl.MyMessageBox;
+using ShareVersionCtrl.RefManage;
 using ShareVersionCtrl.XMLRelated;
 using System;
 using System.Collections.Generic;
@@ -15,6 +16,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.ComponentModel;
 
 namespace ShareVersionCtrl
 {
@@ -33,7 +35,6 @@ namespace ShareVersionCtrl
     /// </summary>
     public partial class MainWindow : Window
     {
-        public const String passwd = "pkumakerspace";
         FileAndFolderModel MainFolder;
         List<VersionModel> Versions;
         List<KeyValuePair<TreeViewItem, FileAndFolderModel>> treeFolderMap;
@@ -43,6 +44,8 @@ namespace ShareVersionCtrl
         SingleVersionFile foundSingleVersionFile = null;
         VersionModel foundVersionModel = null;
         public String targetFolder = "../共享";
+        private bool ModifyPer = false;
+        RefManager refManager;
 
         public MainWindow()
         {
@@ -61,40 +64,68 @@ namespace ShareVersionCtrl
                 MainFolder = new FileAndFolderModel("Folder");
                 Versions = new List<VersionModel>();
             }
+            refManager = new RefManager();
+            newFile.IsEnabled = false;
+            refreshFile.IsEnabled = false;
+            deleteFile.IsEnabled = false;
+            newFolder.IsEnabled = false;
+            renameFolder.IsEnabled = false;
+            deleteFolder.IsEnabled = false;
+            createVerion.IsEnabled = false;
+            deleteVersion.IsEnabled = false;
+            newRef.IsEnabled = false;
+            deleteRef.IsEnabled = false;
             //MessageBox.Show(MainFolder.GetTreeInfo(0));
             //MessageBox.Show(VersionModel.ShowAllVersion(Versions));
             ShowFolderTree();
             ShowVersionTree();
             treeView.SelectedItemChanged += TreeView_SelectedItemChanged;
             treeViewVersion.SelectedItemChanged += TreeViewVersion_SelectedItemChanged;
-            onSelectFileChanged();
-            onSelectVersionChanged();
             /*Directory.CreateDirectory(targetFolder);
             MessageBox.Show("" + Directory.Exists(targetFolder));
             Directory.Delete(targetFolder, true); //不能删除非空文件夹
             MessageBox.Show("" + Directory.Exists(targetFolder));*/
             this.KeyDown += MainWindow_KeyDown;
             newRef.Click += NewRef_Click;
+            deleteRef.Click += DeleteRef_Click;
+        }
+
+        private void DeleteRef_Click(object sender, RoutedEventArgs e)
+        {
+            if (foundVersionModel == null)
+            {
+                MessageBox.Show("软件错误，请联系管理员");
+                return;
+            }
+            if (foundVersionModel.versionList.Count != 0)
+            {
+                if (NoAskNsg.Show("删除非空引用将删除其下所有版本，确认删除吗？", 
+                    "删除引用") == false) {
+                    return;
+                }
+            }
+            //MessageBox.Show("正在删除");
+            //以后还要在这里实现删除的时候连带所有的引用一并删除！！！
+            refManager.DeleteRef(foundVersionModel.FileName);
+            Versions.Remove(foundVersionModel);
+            ShowVersionTree();
         }
 
         private void MainWindow_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.S && (Keyboard.Modifiers & (ModifierKeys.Control)) == (ModifierKeys.Control))
+            if (e.Key == Key.O && (Keyboard.Modifiers & (ModifierKeys.Control)) == (ModifierKeys.Control))
             {
-                AskSingleInput.InputData inputData = new AskSingleInput.InputData();
-                if (AskSingleInput.Show("管理员修改密码：", "保存设置", inputData) == true)
+                if (ModifyPer == true)
                 {
-                    //MessageBox.Show("Success");
-                    if (inputData.Input.Equals(passwd))
-                    {
-                        //密码通过
-                        XmlEncoder.XmlOutput(MainFolder, Versions, "record.xml");
-                        MessageBox.Show("修改保存成功");
-                    }
-                    else
-                    {
-                        MessageBox.Show("密码错误");
-                    }
+                    MessageBox.Show("权限已开启，无需重复操作");
+                    return;
+                }
+                if (PasswdCheck.Check())
+                {
+                    ModifyPer = true;
+                    MessageBox.Show("开启权限成功");
+                    onSelectFileChanged();
+                    onSelectVersionChanged();
                 }
             }
         }
@@ -105,14 +136,24 @@ namespace ShareVersionCtrl
             if (AskSingleInput.Show("引用名称：", "新建引用", inputData) == true)
             {
                 //MessageBox.Show("Success");
+                foreach (VersionModel x in Versions)
+                {
+                    if (x.Equals(inputData.Input))
+                    {
+                        MessageBox.Show("该引用已存在");
+                        return;
+                    }
+                }
                 VersionModel versionModel = new VersionModel(inputData.Input);
                 Versions.Add(versionModel);
+                refManager.CreateRef(inputData.Input);
                 ShowVersionTree();
             }
         }
 
         public void onSelectFileChanged()
         {
+            if (ModifyPer == false) return;
             if (foundFileOrFolder == null)
             {
                 newFile.IsEnabled = false;
@@ -148,6 +189,8 @@ namespace ShareVersionCtrl
 
         public void onSelectVersionChanged()
         {
+            if (ModifyPer == false) return;
+            newRef.IsEnabled = true;
             if (foundSingleVersionFile == null)
             {
                 deleteVersion.IsEnabled = false;
@@ -166,6 +209,7 @@ namespace ShareVersionCtrl
                 createVerion.IsEnabled = true;
                 deleteRef.IsEnabled = true;
             }
+            
         }
 
         private void TreeViewVersion_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
@@ -245,16 +289,32 @@ namespace ShareVersionCtrl
             rootFolder.Header = "MainFolder";
             MainFolder.ShowInTreeFolder(rootFolder, treeFolderMap);
             treeView.Items.Add(rootFolder);
+            rootFolder.IsSelected = true;
             rootFolder.IsExpanded = true;
             //MessageBox.Show("FolderMapCount = " + treeFolderMap.Count);
+            onSelectFileChanged();
+            TreeView_SelectedItemChanged(null, null);
         }
         public void ShowVersionTree()
         {
+            treeSingleVersionMap.Clear();
+            treeVersionMap.Clear();
             treeViewVersion.Items.Clear();
             foreach (VersionModel x in Versions)
             {
                 x.ShowInTree(treeViewVersion, treeSingleVersionMap, treeVersionMap);
             }
+            if (treeVersionMap.Count != 0)
+            {
+                treeVersionMap[0].Key.IsSelected = true;
+            }
+            TreeViewVersion_SelectedItemChanged(null, null);
+        }
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            //自动保存所有设置
+            XmlEncoder.XmlOutput(MainFolder, Versions, "record.xml");
+            base.OnClosing(e);
         }
     }
 }

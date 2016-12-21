@@ -32,6 +32,10 @@ namespace ShareVersionCtrl.XMLRelated
             {
                 return FileName.Equals((String)obj);
             }
+            if (obj is VersionModel)
+            {
+                return FileName.Equals(((VersionModel)obj).FileName);
+            }
             return false;
         }
         public override int GetHashCode()

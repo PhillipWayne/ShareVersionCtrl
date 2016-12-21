@@ -57,6 +57,11 @@
     <Compile Include="MyMessageBox\AskSingleInput.xaml.cs">
       <DependentUpon>AskSingleInput.xaml</DependentUpon>
     </Compile>
+    <Compile Include="MyMessageBox\NoAskNsg.xaml.cs">
+      <DependentUpon>NoAskNsg.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="PasswdCheck.cs" />
+    <Compile Include="RefManage\RefManager.cs" />
     <Compile Include="XMLRelated\XmlEncoder.cs" />
     <Compile Include="XMLRelated\FileAndFolderModel.cs" />
     <Compile Include="XMLRelated\SingleVersionFile.cs" />
@@ -75,6 +80,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="MyMessageBox\AskSingleInput.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MyMessageBox\NoAskNsg.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

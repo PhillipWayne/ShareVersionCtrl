@@ -29,6 +29,16 @@ namespace ShareVersionCtrl.MyMessageBox
             textBlock.Text = Ask;
             this.button_ok.Click += Button_ok_Click;
             this.button_cancel.Click += Button_cancel_Click;
+            textBox.Focus();
+            textBox.KeyUp += TextBox_KeyUp;
+        }
+
+        private void TextBox_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                Button_ok_Click(null, null);
+            }
         }
 
         private void Button_cancel_Click(object sender, RoutedEventArgs e)
