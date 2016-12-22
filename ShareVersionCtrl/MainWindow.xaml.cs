@@ -92,6 +92,35 @@ namespace ShareVersionCtrl
             createVerion.Click += CreateVerion_Click;
             deleteVersion.Click += DeleteVersion_Click;
             newFolder.Click += NewFolder_Click;
+            newFile.Click += NewFile_Click;
+        }
+
+        private void NewFile_Click(object sender, RoutedEventArgs e)
+        {
+            if (foundFileOrFolder == null || foundFileOrFolder.Type !=
+                FileAndFolderModel.Type_Folder) return;
+            AskSelectList.InputData inputData = new AskSelectList.InputData();
+            List<String> refSelectList = new List<string>();
+            foreach (VersionModel x in Versions) refSelectList.Add(x.FileName);
+            inputData.listItems = refSelectList;
+            if (AskSelectList.Show("选择引用", inputData) == true)
+            {
+                VersionModel versionModel = Versions[inputData.SelectIndex];
+                AskSelectList.InputData inputData2 = new AskSelectList.InputData();
+                List<String> versionSelectList = new List<string>();
+                foreach (SingleVersionFile x in versionModel.versionList)
+                    versionSelectList.Add(x.VersionName);
+                inputData2.listItems = versionSelectList;
+                if (AskSelectList.Show("选择版本", inputData2) == true)
+                {
+                    SingleVersionFile svf = versionModel.versionList[inputData2.SelectIndex];
+                    FileAndFolderModel ffm = new FileAndFolderModel("File");
+                    ffm.FileName = svf.FatherName;
+                    ffm.VersionName = svf.VersionName;
+                    foundFileOrFolder.Children.Add(ffm);
+                    ShowFolderTree();
+                }
+            }
         }
 
         private void NewFolder_Click(object sender, RoutedEventArgs e)
